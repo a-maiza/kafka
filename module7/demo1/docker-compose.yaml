@@ -46,6 +46,7 @@ services:
     container_name: broker-1
     volumes:
       - ./broker-1-data:/var/lib/kafka/data
+      - ./jmx-exporter:/jmx-exporter
     depends_on:
       - zookeeper-1
       - zookeeper-2
@@ -53,13 +54,24 @@ services:
     ports:
       - 9092:9092
       - 29092:29092
+      - 9991:9991
+      - 7071:7071
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
       KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,INTERNAL://broker-1:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: HOST:PLAINTEXT,INTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_SNAPSHOT_TRUST_EMPTY: true
+      KAFKA_JMX_PORT: 9991
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_OPTS: >-
+        -javaagent:/jmx-exporter/jmx_prometheus_javaagent-1.0.1.jar=7071:/jmx-exporter/kafka-2_0_0.yml
+        -Dcom.sun.management.jmxremote
+        -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false
+        -Djava.rmi.server.hostname=localhost
+        -Dcom.sun.management.jmxremote.rmi.port=9991
 
   broker-2:
     image: confluentinc/cp-kafka:7.4.1
@@ -67,6 +79,7 @@ services:
     container_name: broker-2
     volumes:
       - ./broker-2-data:/var/lib/kafka/data
+      - ./jmx-exporter:/jmx-exporter
     depends_on:
       - zookeeper-1
       - zookeeper-2
@@ -75,13 +88,24 @@ services:
     ports:
       - 9093:9093
       - 29093:29093
+      - 9992:9992
+      - 7072:7072
     environment:
       KAFKA_BROKER_ID: 2
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
       KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9093,INTERNAL://broker-2:29093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: HOST:PLAINTEXT,INTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_SNAPSHOT_TRUST_EMPTY: true
+      KAFKA_JMX_PORT: 9992
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_OPTS: >-
+        -javaagent:/jmx-exporter/jmx_prometheus_javaagent-1.0.1.jar=7072:/jmx-exporter/kafka-2_0_0.yml
+        -Dcom.sun.management.jmxremote
+        -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false
+        -Djava.rmi.server.hostname=localhost
+        -Dcom.sun.management.jmxremote.rmi.port=9992
 
   broker-3:
     image: confluentinc/cp-kafka:7.4.1
@@ -89,6 +113,7 @@ services:
     container_name: broker-3
     volumes:
       - ./broker-3-data:/var/lib/kafka/data
+      - ./jmx-exporter:/jmx-exporter
     depends_on:
       - zookeeper-1
       - zookeeper-2
@@ -98,6 +123,8 @@ services:
     ports:
       - 9094:9094
       - 29094:29094
+      - 9993:9993
+      - 7073:7073
     environment:
       KAFKA_BROKER_ID: 3
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181
@@ -105,6 +132,15 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: HOST:PLAINTEXT,INTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_SNAPSHOT_TRUST_EMPTY: true
+      KAFKA_JMX_PORT: 9993
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_OPTS: >-
+        -javaagent:/jmx-exporter/jmx_prometheus_javaagent-1.0.1.jar=7073:/jmx-exporter/kafka-2_0_0.yml
+        -Dcom.sun.management.jmxremote
+        -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false
+        -Djava.rmi.server.hostname=localhost
+        -Dcom.sun.management.jmxremote.rmi.port=9993
 
 
   rest-proxy:
